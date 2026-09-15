@@ -17,6 +17,7 @@ class Site(Base):
         enrollment_target (int): Target number of patients to enroll.
         staff_turnover_rate (float): Annual site staff turnover rate (0.0 - 1.0).
         last_monitoring_visit_date (date): Date of the most recent CRA monitoring visit.
+        average_query_resolution_days (float): Average days required to resolve data clarification queries.
     """
     __tablename__ = "sites"
 
@@ -26,6 +27,7 @@ class Site(Base):
     enrollment_target = Column(Integer, nullable=False, default=0)
     staff_turnover_rate = Column(Float, nullable=False, default=0.0)
     last_monitoring_visit_date = Column(Date, nullable=True)
+    average_query_resolution_days = Column(Float, nullable=False, default=7.0)
 
     # Relationships
     patients = relationship("Patient", back_populates="site", cascade="all, delete-orphan")

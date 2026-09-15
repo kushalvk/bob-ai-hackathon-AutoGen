@@ -84,7 +84,10 @@ def get_detection_results(
             "site_id": d.site_id,
             "type": d.type,
             "severity": d.severity,
+            "default_severity": d.default_severity,
+            "final_severity": d.final_severity,
             "severity_rationale": d.severity_rationale,
+            "severity_source": d.severity_source,
             "evidence": d.evidence,
             "detected_at": d.detected_at.isoformat() if d.detected_at else None,
         })

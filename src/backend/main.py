@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from src.backend.config import settings
 from src.backend.api.health import router as health_router
 from src.backend.api.detect import router as detect_router
+from src.backend.api.risk import router as risk_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -14,6 +15,7 @@ app = FastAPI(
 # Include API routers
 app.include_router(health_router)
 app.include_router(detect_router)
+app.include_router(risk_router)
 
 
 @app.get("/")
@@ -28,5 +30,7 @@ def root():
         "health_check": "/health",
         "detect_run": "/api/detect/run",
         "detect_results": "/api/detect/results",
+        "risk_compute": "/api/risk/compute",
+        "risk_scores": "/api/risk/scores",
         "docs": "/docs",
     }

@@ -1,0 +1,87 @@
+# ClinGuard AI — Severity Classification Rules
+# ================================================
+# Deterministic default-severity table aligned to ICH E6(R2) GCP definitions.
+#
+# Severity Levels:
+#   major          — impacts patient safety, rights, or reliability/integrity of trial data
+#   minor          — does not significantly impact patient safety or data integrity
+#   administrative — process/paperwork issue with no safety or data impact
+#
+# Each deviation type specifies:
+#   default_severity  — the severity assigned when no conditional override matches
+#   ambiguous         — if true, ALL instances of this type trigger LLM review
+#   conditions        — ordered list of conditional overrides evaluated against evidence fields
+#     - field         — dot-path into the deviation's evidence.delta dict (e.g. "days_outside_window")
+#     - operator      — comparison operator: gt, gte, lt, lte, eq
+#     - threshold     — numeric threshold value
+#     - severity      — severity to assign if the condition matches
+#     - ambiguous     — if true AND condition matches, flag for LLM review instead of hard-assigning
+
+severity_rules:
+
+  banned_comed:
+    default_severity: major
+    ambiguous: false
+    rationale_template: >-
+      Prohibited concomitant medication detected. Per ICH E6(R2) §4.5,
+      this constitutes a major deviation impacting patient safety.
+
+  missed_visit:
+    default_severity: minor
+    ambiguous: false
+    rationale_template: >-
+      Visit conducted outside the protocol-specified window.
+      Per ICH E6(R2) §4.5, classified based on clinical impact.
+    conditions:
+      # If >14 days outside window, auto-escalate to major (data integrity risk)
+      - field: days_outside_window
+        operator: gt
+        threshold: 14
+        severity: major
+        ambiguous: false
+        rationale_template: >-
+          Visit conducted >14 days outside protocol window. Per ICH E6(R2)
+          §4.5 and §6.4, prolonged deviation from the visit schedule
+          impacts the reliability of trial data. Classified as major.
+      # If ≤3 days outside window, borderline — request LLM review
+      - field: days_outside_window
+        operator: lte
+        threshold: 3
+        severity: minor
+        ambiguous: true
+        rationale_template: >-
+          Visit conducted marginally outside the protocol window (≤3 days).
+          Borderline case requiring clinical judgment review.
+
+  wrong_dose:
+    default_severity: major
+    ambiguous: false
+    rationale_template: >-
+      Dosing deviation detected. Per ICH E6(R2) §4.5, dose discrepancies
+      impact data integrity and potentially patient safety.
+    conditions:
+      # Small dose deviation (≤10%) — ambiguous, send to LLM
+      - field: percentage_deviation
+        operator: lte
+        threshold: 10
+        severity: minor
+        ambiguous: true
+        rationale_template: >-
+          Dose deviation ≤10% from protocol specification. Borderline case
+          requiring clinical judgment to assess data integrity impact.
+
+  eligibility_breach:
+    default_severity: major
+    ambiguous: false
+    rationale_template: >-
+      Eligibility criteria breach detected. Per ICH E6(R2) §4.3 and §6.1,
+      enrollment of ineligible subjects is a major protocol deviation
+      impacting data integrity.
+
+  documentation:
+    default_severity: administrative
+    ambiguous: false
+    rationale_template: >-
+      Documentation gap identified. Per ICH E6(R2) §8.1, this is an
+      administrative deviation with no direct impact on patient safety
+      or data integrity.

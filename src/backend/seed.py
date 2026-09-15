@@ -22,6 +22,7 @@ from src.backend.models import (
     SiteRiskScore,
     CAPAReport,
 )
+from src.backend.risk.engine import calculate_site_risk
 
 # Set deterministic random seed
 SEED_VALUE = 42
@@ -98,6 +99,7 @@ def create_sites(db: Session) -> List[Site]:
             "enrollment_target": 40,
             "staff_turnover_rate": 0.35,
             "last_monitoring_visit_date": date(2026, 6, 15),
+            "average_query_resolution_days": 24.5,
         },
         {
             "site_id": "SITE-102",
@@ -106,6 +108,7 @@ def create_sites(db: Session) -> List[Site]:
             "enrollment_target": 35,
             "staff_turnover_rate": 0.15,
             "last_monitoring_visit_date": date(2026, 7, 20),
+            "average_query_resolution_days": 14.0,
         },
         {
             "site_id": "SITE-103",
@@ -114,6 +117,7 @@ def create_sites(db: Session) -> List[Site]:
             "enrollment_target": 30,
             "staff_turnover_rate": 0.12,
             "last_monitoring_visit_date": date(2026, 8, 10),
+            "average_query_resolution_days": 11.5,
         },
         {
             "site_id": "SITE-104",
@@ -122,6 +126,7 @@ def create_sites(db: Session) -> List[Site]:
             "enrollment_target": 35,
             "staff_turnover_rate": 0.08,
             "last_monitoring_visit_date": date(2026, 8, 25),
+            "average_query_resolution_days": 8.0,
         },
         {
             "site_id": "SITE-105",
@@ -130,6 +135,7 @@ def create_sites(db: Session) -> List[Site]:
             "enrollment_target": 25,
             "staff_turnover_rate": 0.02,
             "last_monitoring_visit_date": date(2026, 9, 1),
+            "average_query_resolution_days": 3.5,
         },
     ]
 
@@ -284,6 +290,9 @@ def create_patients_and_visit_records(
                         site_id=site.site_id,
                         type="missed_visit",
                         severity=severity,
+                        default_severity=severity,
+                        final_severity=severity,
+                        severity_source="deterministic",
                         severity_rationale=rationale,
                         evidence=evidence,
                         detected_at=datetime.combine(actual_dt, datetime.min.time()) + timedelta(hours=10),
@@ -316,6 +325,9 @@ def create_patients_and_visit_records(
                         site_id=site.site_id,
                         type="wrong_dose",
                         severity=severity,
+                        default_severity=severity,
+                        final_severity=severity,
+                        severity_source="deterministic",
                         severity_rationale=rationale,
                         evidence=evidence,
                         detected_at=datetime.combine(actual_dt, datetime.min.time()) + timedelta(hours=11),
@@ -342,6 +354,9 @@ def create_patients_and_visit_records(
                         site_id=site.site_id,
                         type="banned_comed",
                         severity=severity,
+                        default_severity=severity,
+                        final_severity=severity,
+                        severity_source="deterministic",
                         severity_rationale=rationale,
                         evidence=evidence,
                         detected_at=datetime.combine(actual_dt, datetime.min.time()) + timedelta(hours=14),
@@ -369,6 +384,9 @@ def create_patients_and_visit_records(
                         site_id=site.site_id,
                         type="eligibility_breach",
                         severity=severity,
+                        default_severity=severity,
+                        final_severity=severity,
+                        severity_source="deterministic",
                         severity_rationale=rationale,
                         evidence=evidence,
                         detected_at=datetime.combine(actual_dt, datetime.min.time()) + timedelta(hours=9),
@@ -393,6 +411,9 @@ def create_patients_and_visit_records(
                         site_id=site.site_id,
                         type="documentation",
                         severity=severity,
+                        default_severity=severity,
+                        final_severity=severity,
+                        severity_source="deterministic",
                         severity_rationale=rationale,
                         evidence=evidence,
                         detected_at=datetime.combine(actual_dt, datetime.min.time()) + timedelta(hours=16),
@@ -433,14 +454,20 @@ def create_patients_and_visit_records(
 
 
 def create_site_risk_scores_and_capas(
-    db: Session, sites: List[Site], deviations: List[Deviation]
+    db: Session,
+    sites: List[Site],
+    deviations: List[Deviation],
+    patients: List[Patient] = None,
 ) -> tuple[List[SiteRiskScore], List[CAPAReport]]:
-    """Generate risk score assessments and CAPA reports for sites.
+    """Compute and persist deterministic site risk scores (0-100) and CAPA reports.
+
+    Uses the 7-factor deterministic site risk scoring formula with full factor breakdown.
 
     Args:
         db (Session): Active database session.
         sites (List[Site]): Site instances.
         deviations (List[Deviation]): Planted deviations.
+        patients (List[Patient], optional): Patient instances.
 
     Returns:
         tuple: (site_risk_scores, capa_reports)
@@ -448,22 +475,32 @@ def create_site_risk_scores_and_capas(
     scores = []
     capas = []
     as_of = datetime(2026, 9, 15, 12, 0, 0)
+    as_of_dt = as_of.date()
 
-    # Calculate score based on turnover and deviation counts
+    if patients is None:
+        patients = db.query(Patient).all()
+
     for site in sites:
         site_devs = [d for d in deviations if d.site_id == site.site_id]
-        major_devs = len([d for d in site_devs if d.severity == "major"])
-        minor_devs = len([d for d in site_devs if d.severity != "major"])
+        site_patients = [p for p in patients if p.site_id == site.site_id]
+        major_devs = len([d for d in site_devs if (getattr(d, 'final_severity', None) or getattr(d, 'severity', None)) == "major"])
 
-        turnover_score = min(site.staff_turnover_rate * 100 * 1.5, 40.0)
-        deviation_score = min((major_devs * 15.0) + (minor_devs * 5.0), 60.0)
-        total_score = round(min(turnover_score + deviation_score, 99.9), 1)
+        indicators = {
+            "enrolled_patients": len(site_patients),
+            "enrollment_target": site.enrollment_target,
+            "staff_turnover_rate": site.staff_turnover_rate,
+            "last_monitoring_visit_date": site.last_monitoring_visit_date,
+            "average_query_resolution_days": site.average_query_resolution_days,
+        }
 
-        factors = [
-            {"factor": "Staff Turnover Rate", "weight": 0.40, "value": round(site.staff_turnover_rate, 2)},
-            {"factor": "Major Protocol Deviations", "weight": 0.40, "value": float(major_devs)},
-            {"factor": "Minor / Administrative Gaps", "weight": 0.20, "value": float(minor_devs)},
-        ]
+        risk_result = calculate_site_risk(
+            deviations=site_devs,
+            leading_indicators=indicators,
+            as_of_date=as_of_dt,
+        )
+
+        total_score = risk_result["score"]
+        factors = risk_result["contributing_factors"]
 
         score_model = SiteRiskScore(
             score_id=f"RISK-{site.site_id.split('-')[1]}-20260915",
@@ -477,7 +514,7 @@ def create_site_risk_scores_and_capas(
 
         # Generate CAPA for high-risk site or sites with major deviations
         if major_devs > 0:
-            dev_ids = [d.deviation_id for d in site_devs if d.severity == "major"]
+            dev_ids = [d.deviation_id for d in site_devs if (getattr(d, 'final_severity', None) or getattr(d, 'severity', None)) == "major"]
             capa = CAPAReport(
                 capa_id=f"CAPA-{site.site_id.split('-')[1]}-001",
                 deviation_ids=dev_ids,
