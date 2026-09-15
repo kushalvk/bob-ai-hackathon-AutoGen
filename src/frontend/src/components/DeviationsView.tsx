@@ -3,15 +3,13 @@ import {
   AlertTriangle,
   Sparkles,
   Search,
-  Filter,
   ChevronDown,
   ChevronUp,
   FileCode,
   Calendar,
-  CheckCircle2,
   RefreshCw,
 } from 'lucide-react';
-import { Deviation } from '../types';
+import type { Deviation } from '../types';
 
 interface DeviationsViewProps {
   deviations: Deviation[];

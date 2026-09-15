@@ -3,15 +3,13 @@ import {
   X,
   Send,
   Wrench,
-  Sparkles,
   ChevronDown,
   ChevronUp,
   ShieldCheck,
   Bot,
   User,
-  HelpCircle,
 } from 'lucide-react';
-import { ChatMessage } from '../types';
+import type { ChatMessage } from '../types';
 import { sendChatMessage } from '../api/client';
 
 interface ChatPanelProps {

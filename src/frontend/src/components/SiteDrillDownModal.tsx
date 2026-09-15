@@ -3,10 +3,7 @@ import {
   X,
   Calendar,
   AlertTriangle,
-  User,
-  Clock,
   Building2,
-  FileSpreadsheet,
   Activity,
 } from 'lucide-react';
 import {
@@ -19,7 +16,7 @@ import {
   CartesianGrid,
   Cell,
 } from 'recharts';
-import { SiteRiskScore, Deviation } from '../types';
+import type { SiteRiskScore, Deviation } from '../types';
 
 interface SiteDrillDownModalProps {
   siteId: string | null;
@@ -34,7 +31,7 @@ export const SiteDrillDownModal: React.FC<SiteDrillDownModalProps> = ({
   score,
   deviations,
   onClose,
-  onSelectDeviation,
+  onSelectDeviation: _onSelectDeviation,
 }) => {
   if (!siteId || !score) return null;
 

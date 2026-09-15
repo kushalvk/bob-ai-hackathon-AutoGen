@@ -4,13 +4,9 @@ import {
   TrendingDown,
   Minus,
   ChevronRight,
-  ArrowUpDown,
-  AlertOctagon,
-  Users,
-  Calendar,
   Sparkles,
 } from 'lucide-react';
-import { SiteRiskScore, Deviation } from '../types';
+import type { SiteRiskScore, Deviation } from '../types';
 
 interface RiskHeatmapViewProps {
   scores: SiteRiskScore[];
