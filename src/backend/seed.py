@@ -262,6 +262,21 @@ def create_patients_and_visit_records(
                     dev_counter += 1
                     severity = "major"
                     rationale = f"Visit conducted {days_late} days past window. Exceeds protocol specified tolerance of +-{window_days} days."
+                    min_allowed = scheduled_dt - timedelta(days=window_days)
+                    max_allowed = scheduled_dt + timedelta(days=window_days)
+                    evidence = {
+                        "field": "actual_date",
+                        "expected": {
+                            "scheduled_date": scheduled_dt.isoformat(),
+                            "window_days": window_days,
+                            "allowed_range": [min_allowed.isoformat(), max_allowed.isoformat()],
+                        },
+                        "actual": actual_dt.isoformat(),
+                        "delta": {
+                            "days_offset_from_scheduled": days_late,
+                            "days_outside_window": days_late - window_days,
+                        },
+                    }
                     
                     dev_model = Deviation(
                         deviation_id=dev_id,
@@ -270,6 +285,7 @@ def create_patients_and_visit_records(
                         type="missed_visit",
                         severity=severity,
                         severity_rationale=rationale,
+                        evidence=evidence,
                         detected_at=datetime.combine(actual_dt, datetime.min.time()) + timedelta(hours=10),
                     )
 
@@ -281,6 +297,18 @@ def create_patients_and_visit_records(
                     dev_counter += 1
                     severity = "major"
                     rationale = f"Administered dose ({dose_given} mg) deviates from protocol specification ({dosing_spec['dose']} mg)."
+                    diff = abs(dose_given - dosing_spec["dose"])
+                    pct_dev = round((diff / (dosing_spec["dose"] if dosing_spec["dose"] > 0 else 1.0)) * 100.0, 1)
+                    evidence = {
+                        "field": "dose_given",
+                        "expected": {"drug": dosing_spec["drug"], "dose": dosing_spec["dose"], "unit": "mg"},
+                        "actual": {"drug": drug, "dose": dose_given, "unit": "mg"},
+                        "delta": {
+                            "absolute_difference": diff,
+                            "percentage_deviation": pct_dev,
+                            "allowed_tolerance_pct": 5.0,
+                        },
+                    }
                     
                     dev_model = Deviation(
                         deviation_id=dev_id,
@@ -289,6 +317,7 @@ def create_patients_and_visit_records(
                         type="wrong_dose",
                         severity=severity,
                         severity_rationale=rationale,
+                        evidence=evidence,
                         detected_at=datetime.combine(actual_dt, datetime.min.time()) + timedelta(hours=11),
                     )
 
@@ -300,6 +329,12 @@ def create_patients_and_visit_records(
                     dev_counter += 1
                     severity = "major"
                     rationale = f"Concomitant administration of prohibited CYP3A4 inhibitor ({banned_drug})."
+                    evidence = {
+                        "field": "concomitant_meds",
+                        "expected": {"prohibited_medications": protocol.prohibited_medications},
+                        "actual": banned_drug,
+                        "delta": f"Reported concomitant drug '{banned_drug}' matches prohibited drug list",
+                    }
 
                     dev_model = Deviation(
                         deviation_id=dev_id,
@@ -308,6 +343,7 @@ def create_patients_and_visit_records(
                         type="banned_comed",
                         severity=severity,
                         severity_rationale=rationale,
+                        evidence=evidence,
                         detected_at=datetime.combine(actual_dt, datetime.min.time()) + timedelta(hours=14),
                     )
 
@@ -317,6 +353,15 @@ def create_patients_and_visit_records(
                     dev_counter += 1
                     severity = "major"
                     rationale = "Subject enrolled despite exceeding AST/ALT upper limit threshold established in eligibility criteria."
+                    evidence = {
+                        "field": "eligibility_criteria",
+                        "expected": {
+                            "criterion": "ALT and AST <= 2.5x Upper Limit of Normal (ULN)",
+                            "criteria_list": protocol.eligibility_criteria,
+                        },
+                        "actual": notes,
+                        "delta": "Matched eligibility violation keyword in clinical notes",
+                    }
 
                     dev_model = Deviation(
                         deviation_id=dev_id,
@@ -325,6 +370,7 @@ def create_patients_and_visit_records(
                         type="eligibility_breach",
                         severity=severity,
                         severity_rationale=rationale,
+                        evidence=evidence,
                         detected_at=datetime.combine(actual_dt, datetime.min.time()) + timedelta(hours=9),
                     )
 
@@ -334,6 +380,12 @@ def create_patients_and_visit_records(
                     dev_counter += 1
                     severity = "minor"
                     rationale = "Administrative documentation gap: missing required investigator signature on source log."
+                    evidence = {
+                        "field": "notes",
+                        "expected": "Complete clinical visit notes with Principal Investigator signature verification.",
+                        "actual": notes,
+                        "delta": "Documentation gap identified by keyword: missing signature",
+                    }
 
                     dev_model = Deviation(
                         deviation_id=dev_id,
@@ -342,6 +394,7 @@ def create_patients_and_visit_records(
                         type="documentation",
                         severity=severity,
                         severity_rationale=rationale,
+                        evidence=evidence,
                         detected_at=datetime.combine(actual_dt, datetime.min.time()) + timedelta(hours=16),
                     )
 
@@ -371,6 +424,7 @@ def create_patients_and_visit_records(
                         "type": dev_model.type,
                         "severity": dev_model.severity,
                         "severity_rationale": dev_model.severity_rationale,
+                        "evidence": dev_model.evidence,
                         "detected_at": dev_model.detected_at.isoformat(),
                     })
 

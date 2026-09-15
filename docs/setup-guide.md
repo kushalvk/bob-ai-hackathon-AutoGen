@@ -47,6 +47,8 @@ python -m uvicorn src.backend.main:app --reload --port 8000
 
 The application will be available at:
 - **Health Check Endpoint**: [http://localhost:8000/health](http://localhost:8000/health)
+- **Run Deviation Detection**: `POST http://localhost:8000/api/detect/run`
+- **View Deviation Results**: `GET http://localhost:8000/api/detect/results`
 - **Interactive OpenAPI Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
 - **ReDoc Documentation**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
 

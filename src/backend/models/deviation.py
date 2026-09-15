@@ -1,6 +1,6 @@
 """Deviation SQLAlchemy data model representing protocol deviations."""
 
-from sqlalchemy import Column, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, String, Text, DateTime, JSON, ForeignKey
 from sqlalchemy.orm import relationship
 from src.backend.database import Base
 
@@ -18,6 +18,7 @@ class Deviation(Base):
             ('missed_visit', 'wrong_dose', 'banned_comed', 'eligibility_breach', 'documentation').
         severity (str): Impact severity grade ('major', 'minor', 'administrative').
         severity_rationale (str): Clinical rationale explaining assigned severity level.
+        evidence (dict): Structured audit trail details ({field, expected, actual, delta/details}).
         detected_at (datetime): Timestamp when deviation was identified or flagged.
     """
     __tablename__ = "deviations"
@@ -28,6 +29,7 @@ class Deviation(Base):
     type = Column(String(50), nullable=False)
     severity = Column(String(50), nullable=False)
     severity_rationale = Column(Text, nullable=False)
+    evidence = Column(JSON, nullable=False, default=dict)
     detected_at = Column(DateTime, nullable=False)
 
     # Relationships

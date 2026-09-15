@@ -8,6 +8,20 @@
     "type": "eligibility_breach",
     "severity": "major",
     "severity_rationale": "Subject enrolled despite exceeding AST/ALT upper limit threshold established in eligibility criteria.",
+    "evidence": {
+      "field": "eligibility_criteria",
+      "expected": {
+        "criterion": "ALT and AST <= 2.5x Upper Limit of Normal (ULN)",
+        "criteria_list": [
+          "Age between 18 and 75 years at screening",
+          "ALT and AST <= 2.5x Upper Limit of Normal (ULN)",
+          "No prior history of severe hepatic impairment or acute liver disease",
+          "Written informed consent signed prior to any study procedure"
+        ]
+      },
+      "actual": "Baseline screening lab revealed ALT 3.8x ULN, violating Inclusion/Exclusion criterion #2 (ALT <= 2.5x ULN). Patient enrolled anyway.",
+      "delta": "Matched eligibility violation keyword in clinical notes"
+    },
     "detected_at": "2026-01-29T09:00:00"
   },
   {
@@ -19,6 +33,22 @@
     "type": "missed_visit",
     "severity": "major",
     "severity_rationale": "Visit conducted 21 days past window. Exceeds protocol specified tolerance of +-3 days.",
+    "evidence": {
+      "field": "actual_date",
+      "expected": {
+        "scheduled_date": "2026-02-06",
+        "window_days": 3,
+        "allowed_range": [
+          "2026-02-03",
+          "2026-02-09"
+        ]
+      },
+      "actual": "2026-02-27",
+      "delta": {
+        "days_offset_from_scheduled": 21,
+        "days_outside_window": 18
+      }
+    },
     "detected_at": "2026-02-27T10:00:00"
   },
   {
@@ -30,6 +60,22 @@
     "type": "missed_visit",
     "severity": "major",
     "severity_rationale": "Visit conducted 23 days past window. Exceeds protocol specified tolerance of +-3 days.",
+    "evidence": {
+      "field": "actual_date",
+      "expected": {
+        "scheduled_date": "2026-02-20",
+        "window_days": 3,
+        "allowed_range": [
+          "2026-02-17",
+          "2026-02-23"
+        ]
+      },
+      "actual": "2026-03-15",
+      "delta": {
+        "days_offset_from_scheduled": 23,
+        "days_outside_window": 20
+      }
+    },
     "detected_at": "2026-03-15T10:00:00"
   },
   {
@@ -41,6 +87,24 @@
     "type": "wrong_dose",
     "severity": "major",
     "severity_rationale": "Administered dose (100.0 mg) deviates from protocol specification (50.0 mg).",
+    "evidence": {
+      "field": "dose_given",
+      "expected": {
+        "drug": "ClinGuard-A",
+        "dose": 50.0,
+        "unit": "mg"
+      },
+      "actual": {
+        "drug": "ClinGuard-A",
+        "dose": 100.0,
+        "unit": "mg"
+      },
+      "delta": {
+        "absolute_difference": 50.0,
+        "percentage_deviation": 100.0,
+        "allowed_tolerance_pct": 5.0
+      }
+    },
     "detected_at": "2026-02-10T11:00:00"
   },
   {
@@ -52,6 +116,24 @@
     "type": "wrong_dose",
     "severity": "major",
     "severity_rationale": "Administered dose (100.0 mg) deviates from protocol specification (50.0 mg).",
+    "evidence": {
+      "field": "dose_given",
+      "expected": {
+        "drug": "ClinGuard-A",
+        "dose": 50.0,
+        "unit": "mg"
+      },
+      "actual": {
+        "drug": "ClinGuard-A",
+        "dose": 100.0,
+        "unit": "mg"
+      },
+      "delta": {
+        "absolute_difference": 50.0,
+        "percentage_deviation": 100.0,
+        "allowed_tolerance_pct": 5.0
+      }
+    },
     "detected_at": "2026-02-24T11:00:00"
   },
   {
@@ -63,6 +145,22 @@
     "type": "missed_visit",
     "severity": "major",
     "severity_rationale": "Visit conducted 18 days past window. Exceeds protocol specified tolerance of +-5 days.",
+    "evidence": {
+      "field": "actual_date",
+      "expected": {
+        "scheduled_date": "2026-03-10",
+        "window_days": 5,
+        "allowed_range": [
+          "2026-03-05",
+          "2026-03-15"
+        ]
+      },
+      "actual": "2026-03-28",
+      "delta": {
+        "days_offset_from_scheduled": 18,
+        "days_outside_window": 13
+      }
+    },
     "detected_at": "2026-03-28T10:00:00"
   },
   {
@@ -74,6 +172,24 @@
     "type": "wrong_dose",
     "severity": "major",
     "severity_rationale": "Administered dose (100.0 mg) deviates from protocol specification (0.0 mg).",
+    "evidence": {
+      "field": "dose_given",
+      "expected": {
+        "drug": null,
+        "dose": 0.0,
+        "unit": "mg"
+      },
+      "actual": {
+        "drug": null,
+        "dose": 100.0,
+        "unit": "mg"
+      },
+      "delta": {
+        "absolute_difference": 100.0,
+        "percentage_deviation": 10000.0,
+        "allowed_tolerance_pct": 5.0
+      }
+    },
     "detected_at": "2026-02-01T11:00:00"
   },
   {
@@ -85,6 +201,19 @@
     "type": "banned_comed",
     "severity": "major",
     "severity_rationale": "Concomitant administration of prohibited CYP3A4 inhibitor (Rifampin).",
+    "evidence": {
+      "field": "concomitant_meds",
+      "expected": {
+        "prohibited_medications": [
+          "Ketoconazole",
+          "Clarithromycin",
+          "St. John's Wort",
+          "Rifampin"
+        ]
+      },
+      "actual": "Rifampin",
+      "delta": "Reported concomitant drug 'Rifampin' matches prohibited drug list"
+    },
     "detected_at": "2026-03-07T14:00:00"
   },
   {
@@ -96,6 +225,20 @@
     "type": "eligibility_breach",
     "severity": "major",
     "severity_rationale": "Subject enrolled despite exceeding AST/ALT upper limit threshold established in eligibility criteria.",
+    "evidence": {
+      "field": "eligibility_criteria",
+      "expected": {
+        "criterion": "ALT and AST <= 2.5x Upper Limit of Normal (ULN)",
+        "criteria_list": [
+          "Age between 18 and 75 years at screening",
+          "ALT and AST <= 2.5x Upper Limit of Normal (ULN)",
+          "No prior history of severe hepatic impairment or acute liver disease",
+          "Written informed consent signed prior to any study procedure"
+        ]
+      },
+      "actual": "Baseline screening lab revealed ALT 3.8x ULN, violating Inclusion/Exclusion criterion #2 (ALT <= 2.5x ULN). Patient enrolled anyway.",
+      "delta": "Matched eligibility violation keyword in clinical notes"
+    },
     "detected_at": "2026-02-22T09:00:00"
   },
   {
@@ -107,6 +250,22 @@
     "type": "missed_visit",
     "severity": "major",
     "severity_rationale": "Visit conducted 23 days past window. Exceeds protocol specified tolerance of +-5 days.",
+    "evidence": {
+      "field": "actual_date",
+      "expected": {
+        "scheduled_date": "2026-04-04",
+        "window_days": 5,
+        "allowed_range": [
+          "2026-03-30",
+          "2026-04-09"
+        ]
+      },
+      "actual": "2026-04-27",
+      "delta": {
+        "days_offset_from_scheduled": 23,
+        "days_outside_window": 18
+      }
+    },
     "detected_at": "2026-04-27T10:00:00"
   },
   {
@@ -118,6 +277,24 @@
     "type": "wrong_dose",
     "severity": "major",
     "severity_rationale": "Administered dose (20.0 mg) deviates from protocol specification (10.0 mg).",
+    "evidence": {
+      "field": "dose_given",
+      "expected": {
+        "drug": "ClinGuard-B",
+        "dose": 10.0,
+        "unit": "mg"
+      },
+      "actual": {
+        "drug": "ClinGuard-B",
+        "dose": 20.0,
+        "unit": "mg"
+      },
+      "delta": {
+        "absolute_difference": 10.0,
+        "percentage_deviation": 100.0,
+        "allowed_tolerance_pct": 5.0
+      }
+    },
     "detected_at": "2026-03-24T11:00:00"
   },
   {
@@ -129,6 +306,20 @@
     "type": "eligibility_breach",
     "severity": "major",
     "severity_rationale": "Subject enrolled despite exceeding AST/ALT upper limit threshold established in eligibility criteria.",
+    "evidence": {
+      "field": "eligibility_criteria",
+      "expected": {
+        "criterion": "ALT and AST <= 2.5x Upper Limit of Normal (ULN)",
+        "criteria_list": [
+          "Age between 18 and 75 years at screening",
+          "ALT and AST <= 2.5x Upper Limit of Normal (ULN)",
+          "No prior history of severe hepatic impairment or acute liver disease",
+          "Written informed consent signed prior to any study procedure"
+        ]
+      },
+      "actual": "Baseline screening lab revealed ALT 3.8x ULN, violating Inclusion/Exclusion criterion #2 (ALT <= 2.5x ULN). Patient enrolled anyway.",
+      "delta": "Matched eligibility violation keyword in clinical notes"
+    },
     "detected_at": "2026-01-16T09:00:00"
   },
   {
@@ -140,6 +331,20 @@
     "type": "eligibility_breach",
     "severity": "major",
     "severity_rationale": "Subject enrolled despite exceeding AST/ALT upper limit threshold established in eligibility criteria.",
+    "evidence": {
+      "field": "eligibility_criteria",
+      "expected": {
+        "criterion": "ALT and AST <= 2.5x Upper Limit of Normal (ULN)",
+        "criteria_list": [
+          "Age between 18 and 75 years at screening",
+          "ALT and AST <= 2.5x Upper Limit of Normal (ULN)",
+          "No prior history of severe hepatic impairment or acute liver disease",
+          "Written informed consent signed prior to any study procedure"
+        ]
+      },
+      "actual": "Baseline screening lab revealed ALT 3.8x ULN, violating Inclusion/Exclusion criterion #2 (ALT <= 2.5x ULN). Patient enrolled anyway.",
+      "delta": "Matched eligibility violation keyword in clinical notes"
+    },
     "detected_at": "2026-02-21T09:00:00"
   },
   {
@@ -151,6 +356,12 @@
     "type": "documentation",
     "severity": "minor",
     "severity_rationale": "Administrative documentation gap: missing required investigator signature on source log.",
+    "evidence": {
+      "field": "notes",
+      "expected": "Complete clinical visit notes with Principal Investigator signature verification.",
+      "actual": "Dose administration record missing Principal Investigator signature and verification stamp.",
+      "delta": "Documentation gap identified by keyword: missing signature"
+    },
     "detected_at": "2026-02-14T16:00:00"
   },
   {
@@ -162,6 +373,22 @@
     "type": "missed_visit",
     "severity": "major",
     "severity_rationale": "Visit conducted 17 days past window. Exceeds protocol specified tolerance of +-5 days.",
+    "evidence": {
+      "field": "actual_date",
+      "expected": {
+        "scheduled_date": "2026-03-14",
+        "window_days": 5,
+        "allowed_range": [
+          "2026-03-09",
+          "2026-03-19"
+        ]
+      },
+      "actual": "2026-03-31",
+      "delta": {
+        "days_offset_from_scheduled": 17,
+        "days_outside_window": 12
+      }
+    },
     "detected_at": "2026-03-31T10:00:00"
   },
   {
@@ -173,6 +400,12 @@
     "type": "documentation",
     "severity": "minor",
     "severity_rationale": "Administrative documentation gap: missing required investigator signature on source log.",
+    "evidence": {
+      "field": "notes",
+      "expected": "Complete clinical visit notes with Principal Investigator signature verification.",
+      "actual": "Dose administration record missing Principal Investigator signature and verification stamp.",
+      "delta": "Documentation gap identified by keyword: missing signature"
+    },
     "detected_at": "2026-01-24T16:00:00"
   },
   {
@@ -184,6 +417,19 @@
     "type": "banned_comed",
     "severity": "major",
     "severity_rationale": "Concomitant administration of prohibited CYP3A4 inhibitor (Ketoconazole).",
+    "evidence": {
+      "field": "concomitant_meds",
+      "expected": {
+        "prohibited_medications": [
+          "Ketoconazole",
+          "Clarithromycin",
+          "St. John's Wort",
+          "Rifampin"
+        ]
+      },
+      "actual": "Ketoconazole",
+      "delta": "Reported concomitant drug 'Ketoconazole' matches prohibited drug list"
+    },
     "detected_at": "2026-03-20T14:00:00"
   },
   {
@@ -195,6 +441,22 @@
     "type": "missed_visit",
     "severity": "major",
     "severity_rationale": "Visit conducted 17 days past window. Exceeds protocol specified tolerance of +-3 days.",
+    "evidence": {
+      "field": "actual_date",
+      "expected": {
+        "scheduled_date": "2026-02-13",
+        "window_days": 3,
+        "allowed_range": [
+          "2026-02-10",
+          "2026-02-16"
+        ]
+      },
+      "actual": "2026-03-02",
+      "delta": {
+        "days_offset_from_scheduled": 17,
+        "days_outside_window": 14
+      }
+    },
     "detected_at": "2026-03-02T10:00:00"
   },
   {
@@ -206,6 +468,24 @@
     "type": "wrong_dose",
     "severity": "major",
     "severity_rationale": "Administered dose (100.0 mg) deviates from protocol specification (50.0 mg).",
+    "evidence": {
+      "field": "dose_given",
+      "expected": {
+        "drug": "ClinGuard-A",
+        "dose": 50.0,
+        "unit": "mg"
+      },
+      "actual": {
+        "drug": "ClinGuard-A",
+        "dose": 100.0,
+        "unit": "mg"
+      },
+      "delta": {
+        "absolute_difference": 50.0,
+        "percentage_deviation": 100.0,
+        "allowed_tolerance_pct": 5.0
+      }
+    },
     "detected_at": "2026-02-11T11:00:00"
   },
   {
@@ -217,6 +497,24 @@
     "type": "wrong_dose",
     "severity": "major",
     "severity_rationale": "Administered dose (100.0 mg) deviates from protocol specification (50.0 mg).",
+    "evidence": {
+      "field": "dose_given",
+      "expected": {
+        "drug": "ClinGuard-A",
+        "dose": 50.0,
+        "unit": "mg"
+      },
+      "actual": {
+        "drug": "ClinGuard-A",
+        "dose": 100.0,
+        "unit": "mg"
+      },
+      "delta": {
+        "absolute_difference": 50.0,
+        "percentage_deviation": 100.0,
+        "allowed_tolerance_pct": 5.0
+      }
+    },
     "detected_at": "2026-02-06T11:00:00"
   },
   {
@@ -228,6 +526,19 @@
     "type": "banned_comed",
     "severity": "major",
     "severity_rationale": "Concomitant administration of prohibited CYP3A4 inhibitor (Rifampin).",
+    "evidence": {
+      "field": "concomitant_meds",
+      "expected": {
+        "prohibited_medications": [
+          "Ketoconazole",
+          "Clarithromycin",
+          "St. John's Wort",
+          "Rifampin"
+        ]
+      },
+      "actual": "Rifampin",
+      "delta": "Reported concomitant drug 'Rifampin' matches prohibited drug list"
+    },
     "detected_at": "2026-01-24T14:00:00"
   },
   {
@@ -239,6 +550,24 @@
     "type": "wrong_dose",
     "severity": "major",
     "severity_rationale": "Administered dose (20.0 mg) deviates from protocol specification (10.0 mg).",
+    "evidence": {
+      "field": "dose_given",
+      "expected": {
+        "drug": "ClinGuard-B",
+        "dose": 10.0,
+        "unit": "mg"
+      },
+      "actual": {
+        "drug": "ClinGuard-B",
+        "dose": 20.0,
+        "unit": "mg"
+      },
+      "delta": {
+        "absolute_difference": 10.0,
+        "percentage_deviation": 100.0,
+        "allowed_tolerance_pct": 5.0
+      }
+    },
     "detected_at": "2026-03-28T11:00:00"
   },
   {
@@ -250,6 +579,19 @@
     "type": "banned_comed",
     "severity": "major",
     "severity_rationale": "Concomitant administration of prohibited CYP3A4 inhibitor (Clarithromycin).",
+    "evidence": {
+      "field": "concomitant_meds",
+      "expected": {
+        "prohibited_medications": [
+          "Ketoconazole",
+          "Clarithromycin",
+          "St. John's Wort",
+          "Rifampin"
+        ]
+      },
+      "actual": "Clarithromycin",
+      "delta": "Reported concomitant drug 'Clarithromycin' matches prohibited drug list"
+    },
     "detected_at": "2026-03-21T14:00:00"
   },
   {
@@ -261,6 +603,12 @@
     "type": "documentation",
     "severity": "minor",
     "severity_rationale": "Administrative documentation gap: missing required investigator signature on source log.",
+    "evidence": {
+      "field": "notes",
+      "expected": "Complete clinical visit notes with Principal Investigator signature verification.",
+      "actual": "Dose administration record missing Principal Investigator signature and verification stamp.",
+      "delta": "Documentation gap identified by keyword: missing signature"
+    },
     "detected_at": "2026-02-18T16:00:00"
   }
 ]
